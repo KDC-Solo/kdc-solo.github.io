@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="logo.svg">
 <meta property="og:title" content="KDC Solo">
 <meta property="og:description" content="Companion apps that run the bot — so you can play the game.">
-<meta property="og:image" content="https://kdc-solo.github.io/avatar.png">
+<meta property="og:image" content="https://solo.kdc.sh/avatar.png">
 <style>
   :root {
     --slate-900: #0f172a;
@@ -71,8 +71,6 @@
     border: 1px solid var(--slate-700);
     border-radius: 16px;
     padding: 28px;
-    text-decoration: none;
-    color: inherit;
     transition: border-color 0.15s, transform 0.15s;
     display: flex;
     flex-direction: column;
@@ -85,13 +83,31 @@
   .card .emoji { font-size: 2rem; }
   .card h2 { font-size: 1.15rem; font-weight: 700; }
   .card p { color: var(--slate-400); font-size: 0.95rem; line-height: 1.6; flex-grow: 1; }
-  .card .status {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--amber-400);
+  .card .links {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 6px;
   }
+  .card .play {
+    background: linear-gradient(135deg, var(--amber-400), var(--amber-600));
+    color: var(--slate-900);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    transition: filter 0.15s;
+  }
+  .card .play:hover { filter: brightness(1.1); }
+  .card .repo {
+    color: var(--slate-400);
+    font-size: 0.85rem;
+    text-decoration: none;
+  }
+  .card .repo:hover { color: var(--amber-400); }
   footer {
     margin-top: auto;
     padding: 32px 24px 48px;
@@ -136,24 +152,33 @@
   </p>
 
   <div class="cards">
-    <a class="card" href="https://github.com/KDC-Solo/dune-war-for-arrakis">
+    <div class="card">
       <span class="emoji">🪐</span>
       <h2>Dune: War for Arrakis</h2>
       <p>Automates the Mahdi Harkonnen AI so the desert fights back without the flowchart.</p>
-      <span class="status">▶ Playable</span>
-    </a>
-    <a class="card" href="https://github.com/KDC-Solo/on-mars">
+      <div class="links">
+        <a class="play" href="https://solo.kdc.sh/dune-war-for-arrakis/">▶ Play</a>
+        <a class="repo" href="https://github.com/KDC-Solo/dune-war-for-arrakis">GitHub ↗</a>
+      </div>
+    </div>
+    <div class="card">
       <span class="emoji">🔴</span>
       <h2>On Mars</h2>
       <p>Runs the Lacerda bot and cuts the solo bookkeeping in one of the heaviest euros around.</p>
-      <span class="status">▶ Playable</span>
-    </a>
-    <a class="card" href="https://github.com/KDC-Solo/brass-birmingham">
+      <div class="links">
+        <a class="play" href="https://solo.kdc.sh/on-mars/">▶ Play</a>
+        <a class="repo" href="https://github.com/KDC-Solo/on-mars">GitHub ↗</a>
+      </div>
+    </div>
+    <div class="card">
       <span class="emoji">🏭</span>
       <h2>Brass: Birmingham</h2>
       <p>Solo companion for Brass: Birmingham — play the canal and rail eras against an automated rival.</p>
-      <span class="status">▶ Playable</span>
-    </a>
+      <div class="links">
+        <a class="play" href="https://solo.kdc.sh/brass-birmingham/">▶ Play</a>
+        <a class="repo" href="https://github.com/KDC-Solo/brass-birmingham">GitHub ↗</a>
+      </div>
+    </div>
   </div>
 </main>
 
