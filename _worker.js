@@ -1,15 +1,20 @@
-// Serves the root site's own static files directly. Anything not found here
-// (e.g. /dune-war-for-arrakis/*, /on-mars/*) is transparently proxied to the
-// matching KDC-Solo project repo on kdc-solo.github.io, which each publish
-// independently via their own GitHub Pages workflow. This lets solo.kdc.sh
-// stay on Cloudflare Pages while every per-game subfolder keeps working
-// without touching those other repos.
-const UPSTREAM_HOST = 'kdc-solo.github.io';
+// Serves the root site's own static files directly. Every companion app
+// (dune-war-for-arrakis, on-mars, brass-birmingham, kanban-ev, ...) is its
+// own standalone Cloudflare Pages project, deployed independently by that
+// repo's own GitHub Actions workflow. This worker strips the leading
+// /<app>/ segment and proxies the rest of the request to that project's
+// <app>.pages.dev, so solo.kdc.sh/<app>/ keeps working without those repos
+// needing to know anything about this domain.
+const APP_PROJECTS = {
+  'dune-war-for-arrakis': 'dune-war-for-arrakis.pages.dev',
+  'on-mars': 'on-mars.pages.dev',
+  'brass-birmingham': 'brass-birmingham.pages.dev',
+  'kanban-ev': 'kanban-ev.pages.dev',
+};
 
 // Cloudflare Pages' asset binding falls back to index.html (200) for any
 // unmatched path instead of a real 404, so we can't detect "not a static
-// file" that way. List the root site's own files explicitly instead;
-// everything else falls through to the upstream proxy below.
+// file" that way. List the root site's own files explicitly instead.
 const STATIC_PATHS = new Set([
   '/',
   '/index.html',
@@ -23,22 +28,41 @@ const STATIC_PATHS = new Set([
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
     if (STATIC_PATHS.has(url.pathname)) {
       return env.ASSETS.fetch(request);
     }
 
-    const upstreamUrl = new URL(url.pathname + url.search, `https://${UPSTREAM_HOST}`);
+    const firstSlash = url.pathname.indexOf('/', 1);
+    const slug = firstSlash === -1 ? url.pathname.slice(1) : url.pathname.slice(1, firstSlash);
+    const upstreamHost = APP_PROJECTS[slug];
+
+    if (!upstreamHost) {
+      return env.ASSETS.fetch(request);
+    }
+
+    // "/slug" with no trailing slash: redirect to "/slug/" first, since each
+    // app's build assumes it's served from that trailing-slash base path.
+    if (firstSlash === -1) {
+      const redirectUrl = new URL(url);
+      redirectUrl.pathname = `${url.pathname}/`;
+      return Response.redirect(redirectUrl.toString(), 308);
+    }
+
+    const upstreamPath = url.pathname.slice(firstSlash) || '/';
+    const upstreamUrl = new URL(upstreamPath + url.search, `https://${upstreamHost}`);
     const upstreamResponse = await fetch(new Request(upstreamUrl, request));
 
-    // Rewrite any redirect (e.g. GitHub's trailing-slash redirect) back onto
-    // this domain so visitors never get bounced to the github.io host.
+    // Rewrite any redirect back onto this domain (with the /slug/ prefix
+    // restored) so visitors never get bounced to the *.pages.dev host.
     if (upstreamResponse.status >= 300 && upstreamResponse.status < 400) {
       const location = upstreamResponse.headers.get('location');
       if (location) {
         const rewritten = new URL(location, upstreamUrl);
-        if (rewritten.hostname === UPSTREAM_HOST) {
+        if (rewritten.hostname === upstreamHost) {
           rewritten.hostname = url.hostname;
           rewritten.protocol = url.protocol;
+          rewritten.pathname = `/${slug}${rewritten.pathname}`;
           const headers = new Headers(upstreamResponse.headers);
           headers.set('location', rewritten.toString());
           return new Response(upstreamResponse.body, {
