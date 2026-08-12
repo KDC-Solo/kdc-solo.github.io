@@ -10,6 +10,7 @@ const APP_PROJECTS = {
   'on-mars': 'on-mars.pages.dev',
   'brass-birmingham': 'brass-birmingham.pages.dev',
   'kanban-ev': 'kanban-ev.pages.dev',
+  wayfarer: 'wayfarer.pages.dev',
 };
 
 // Cloudflare Pages' asset binding falls back to index.html (200) for any
