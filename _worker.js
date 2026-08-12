@@ -10,7 +10,12 @@ const APP_PROJECTS = {
   'on-mars': 'on-mars.pages.dev',
   'brass-birmingham': 'brass-birmingham.pages.dev',
   'kanban-ev': 'kanban-ev.pages.dev',
-  wayfarer: 'wayfarer.pages.dev',
+  // Plain "wayfarer.pages.dev" was already taken by an unrelated,
+  // pre-existing Cloudflare Pages project (someone else's Space Traders UI)
+  // — that subdomain namespace is global, not per-account. Cloudflare
+  // assigned ours "wayfarer-ao0.pages.dev" instead when the project was
+  // created; that suffix is fixed for this project going forward.
+  wayfarer: 'wayfarer-ao0.pages.dev',
 };
 
 // Cloudflare Pages' asset binding falls back to index.html (200) for any
